@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Metcha Café</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .password-strength {
+            margin-top: 8px;
+            display: none;
+        }
+        .strength-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        .strength-text {
+            font-size: 12px;
+            color: #666;
+        }
+        .password-requirements {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            color: #999;
+        }
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+        .requirement.met {
+            color: #4caf50;
+        }
+        .requirement .icon {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Create Account</h2>
+        <p class="subtitle">Join Metcha Café today</p>
+        
+        <div id="message" class="message"></div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                </div>
+                
+                <div class="password-requirements">
+                    <div class="requirement" id="req-length">
+                        <span class="icon">○</span>
+                        <span>At least 8 characters</span>
+                    </div>
+                    <div class="requirement" id="req-uppercase">
+                        <span class="icon">○</span>
+                        <span>One uppercase letter</span>
+                    </div>
+                    <div class="requirement" id="req-lowercase">
+                        <span class="icon">○</span>
+                        <span>One lowercase letter</span>
+                    </div>
+                    <div class="requirement" id="req-number">
+                        <span class="icon">○</span>
+                        <span>One number</span>
+                    </div>
+                    <div class="requirement" id="req-special">
+                        <span class="icon">○</span>
+                        <span>One special character (!@#$%^&*)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span id="btnText">Create Account</span>
+            </button>
+        </form>
+        
+        <div class="login-link">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        
+        const form = document.getElementById('registerForm');
+        const passwordInput = document.getElementById('password');
+        const strengthIndicator = document.getElementById('passwordStrength');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const messageDiv = document.getElementById('message');
+
+        const requirements = {
+            length: { regex: /.{8,}/, element: document.getElementById('req-length') },
+            uppercase: { regex: /[A-Z]/, element: document.getElementById('req-uppercase') },
+            lowercase: { regex: /[a-z]/, element: document.getElementById('req-lowercase') },
+            number: { regex: /[0-9]/, element: document.getElementById('req-number') },
+            special: { regex: /[!@#$%^&*(),.?":{}|<>]/, element: document.getElementById('req-special') }
+        };
+
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length > 0) {
+                strengthIndicator.style.display = 'block';
+            } else {
+                strengthIndicator.style.display = 'none';
+                return;
+            }
+            
+            let metCount = 0;
+            for (const [key, req] of Object.entries(requirements)) {
+                if (req.regex.test(password)) {
+                    req.element.classList.add('met');
+                    req.element.querySelector('.icon').textContent = '✓';
+                    metCount++;
+                } else {
+                    req.element.classList.remove('met');
+                    req.element.querySelector('.icon').textContent = '○';
+                }
+            }
+            
+            const strength = (metCount / 5) * 100;
+            strengthFill.style.width = strength + '%';
+            
+            if (strength === 100) {
+                strengthFill.style.backgroundColor = '#4caf50';
+                strengthText.textContent = 'Strong password';
+                strengthText.style.color = '#4caf50';
+            } else if (strength >= 60) {
+                strengthFill.style.backgroundColor = '#ff9800';
+                strengthText.textContent = 'Medium strength';
+                strengthText.style.color = '#ff9800';
+            } else {
+                strengthFill.style.backgroundColor = '#f44336';
+                strengthText.textContent = 'Weak password';
+                strengthText.style.color = '#f44336';
+            }
+        });
+
+        function validatePassword(password) {
+            for (const req of Object.values(requirements)) {
+                if (!req.regex.test(password)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = passwordInput.value;
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+            
+            if (!validatePassword(password)) {
+                showMessage('Password does not meet all requirements. Please check the list above.', 'error');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span>';
+            
+            try {
+                const response = await fetch('register.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    form.reset();
+                    strengthIndicator.style.display = 'none';
+                    
+                    for (const req of Object.values(requirements)) {
+                        req.element.classList.remove('met');
+                        req.element.querySelector('.icon').textContent = '○';
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again later.', 'error');
+                console.error('Registration error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Create Account';
+            }
+        });
+        
+    </script>
+</body>
+</html>

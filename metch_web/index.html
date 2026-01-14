@@ -1,0 +1,1794 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metcha - Premium Matcha &amp; Coffee Drinks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffb6c1, #cfa7ff);
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Parallax background */
+    .parallax-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #ffb6c1, #cfa7ff);
+      z-index: -1;
+      transform: translateZ(0);
+    }
+
+    /* Header styles */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      font-size: 1rem;
+    }
+
+    .nav-links a:hover {
+      color: #c77dff;
+      transform: translateY(-2px);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Mobile menu */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 6px;
+    }
+
+    .menu-toggle span {
+      width: 28px;
+      height: 3px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    /* Main content */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Page sections */
+    .page {
+      display: none;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Hero section */
+    .hero {
+      text-align: center;
+      padding: 5rem 2rem;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border-radius: 40px;
+      margin-bottom: 4rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(199, 125, 255, 0.1) 0%, transparent 70%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      letter-spacing: -2px;
+    }
+
+    .hero p {
+      font-size: 1.4rem;
+      color: #666;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+    }
+
+    /* 3D Button with glow effect */
+    .cta-button {
+      display: inline-block;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px rgba(199, 125, 255, 0.4);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 20px 50px rgba(199, 125, 255, 0.6), 0 0 30px rgba(255, 107, 157, 0.5);
+    }
+
+    .cta-button:active {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    /* Section titles */
+    .section-title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    /* Product grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .product-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(15px);
+      border-radius: 30px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    .product-card:hover {
+      transform: translateY(-15px) rotateX(5deg);
+      box-shadow: 0 25px 60px rgba(199, 125, 255, 0.3), 0 0 40px rgba(255, 107, 157, 0.2);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      margin-bottom: 1.5rem;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(207, 167, 255, 0.2));
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+      transform: scale(1.1) rotateZ(5deg);
+    }
+
+    .product-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .product-description {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .product-price {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.5rem;
+    }
+
+    .add-to-cart {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      font-size: 1rem;
+      box-shadow: 0 8px 25px rgba(199, 125, 255, 0.3);
+    }
+
+    .add-to-cart:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(199, 125, 255, 0.5), 0 0 25px rgba(255, 107, 157, 0.4);
+    }
+
+    /* Auth forms */
+    .auth-container {
+      max-width: 550px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      padding: 3.5rem;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-group {
+      margin-bottom: 1.8rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.7rem;
+      font-weight: 600;
+      color: #333;
+      font-size: 1rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1.2rem;
+      border: 2px solid rgba(199, 125, 255, 0.3);
+      border-radius: 20px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #c77dff;
+      box-shadow: 0 0 0 4px rgba(199, 125, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.3rem;
+      padding: 0.5rem;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+    }
+
+    .password-toggle:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .password-requirements {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+
+    .password-requirements.error {
+      color: #c62828;
+    }
+
+    .password-requirements.success {
+      color: #2e7d32;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      box-shadow: 0 10px 30px rgba(199, 125, 255, 0.4);
+    }
+
+    .submit-button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 45px rgba(199, 125, 255, 0.6), 0 0 30px rgba(255, 107, 157, 0.4);
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 2rem;
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .auth-toggle a {
+      color: #c77dff;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .auth-toggle a:hover {
+      color: #ff6b9d;
+      text-decoration: underline;
+    }
+
+    .success-message, .error-message {
+      padding: 1.2rem;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .success-message {
+      background: rgba(76, 175, 80, 0.15);
+      color: #2e7d32;
+      border: 2px solid rgba(76, 175, 80, 0.4);
+    }
+
+    .error-message {
+      background: rgba(244, 67, 54, 0.15);
+      color: #c62828;
+      border: 2px solid rgba(244, 67, 54, 0.4);
+    }
+
+    /* Contact page */
+    .contact-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 4rem;
+    }
+
+    .contact-form {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .contact-form textarea {
+      width: 100%;
+      padding: 1.2rem;
+      border: 2px solid rgba(199, 125, 255, 0.3);
+      border-radius: 20px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.95);
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    .contact-form textarea:focus {
+      outline: none;
+      border-color: #c77dff;
+      box-shadow: 0 0 0 4px rgba(199, 125, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .map-container {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      height: 500px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 4rem 2rem 2rem;
+      margin-top: 5rem;
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-section {
+      background: rgba(255, 240, 245, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1.8rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
+      transition: all 0.4s ease;
+      transform-style: preserve-3d;
+      border: 2px solid rgba(255, 182, 193, 0.3);
+    }
+
+    .footer-section:hover {
+      transform: translateY(-10px) scale(1.03) rotateX(5deg);
+      box-shadow: 0 20px 50px rgba(255, 182, 193, 0.6), 0 0 40px rgba(255, 182, 193, 0.5);
+      border-color: rgba(255, 182, 193, 0.6);
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-section p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.6rem;
+    }
+
+    .footer-links a {
+      color: #666;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .footer-links a:hover {
+      color: #c77dff;
+      padding-left: 5px;
+    }
+
+    .contact-info {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .contact-item {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255, 182, 193, 0.2);
+    }
+
+    .contact-item:last-child {
+      border-bottom: none;
+    }
+
+    .contact-item strong {
+      color: #333;
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .contact-item span {
+      color: #666;
+      font-weight: 500;
+      font-size: 0.85rem;
+    }
+
+    /* Social media icons with 3D glow effect */
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      text-decoration: none;
+      transition: all 0.4s ease;
+      box-shadow: 0 5px 20px rgba(199, 125, 255, 0.3);
+      transform-style: preserve-3d;
+    }
+
+    .social-icon:hover {
+      transform: translateY(-8px) scale(1.15) rotateZ(10deg);
+      box-shadow: 0 20px 50px rgba(199, 125, 255, 0.6), 0 0 40px rgba(255, 107, 157, 0.6);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 2px solid rgba(199, 125, 255, 0.2);
+      color: #666;
+      font-weight: 500;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .contact-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        width: 100%;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        transition: left 0.4s ease;
+        gap: 1.5rem;
+      }
+
+      .nav-links.active {
+        left: 0;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(9px, 9px);
+      }
+
+      .menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(8px, -8px);
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .section-title {
+        font-size: 2.2rem;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .auth-container {
+        padding: 2rem;
+      }
+
+      #checkout > div {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="parallax-bg"></div><!-- Header -->
+  <header>
+   <nav>
+    <div class="logo" id="site-name">
+     Metcha
+    </div>
+    <ul class="nav-links" id="nav-links">
+     <li><a href="#" data-page="home">Home</a></li>
+     <li><a href="#" data-page="products">Products</a></li>
+     <li><a href="#" data-page="about">About</a></li>
+     <li><a href="#" data-page="contact">Contact</a></li>
+     <li><a href="#" data-page="cart" id="cart-link">🛒 Cart (<span id="cart-count">0</span>)</a></li>
+     <li><a href="#" data-page="auth">Login</a></li>
+    </ul>
+    <div class="menu-toggle" id="menu-toggle"><span></span> <span></span> <span></span>
+    </div>
+   </nav>
+  </header><!-- Main Content -->
+  <main><!-- Home Page -->
+   <div id="home" class="page active">
+    <section class="hero">
+     <div class="hero-content">
+      <h1 id="hero-slogan">Sip the Fun, Taste the Magic</h1>
+      <p id="hero-subtitle">Handcrafted drinks made with love</p><button class="cta-button" data-page="products">View Menu</button>
+     </div>
+    </section>
+    <h2 class="section-title" id="featured-title">Featured Drinks</h2>
+    <div class="products-grid" id="featured-products"></div>
+   </div><!-- Products Page -->
+   <div id="products" class="page">
+    <h2 class="section-title" id="products-title">Our Menu</h2>
+    <div class="products-grid" id="all-products"></div>
+   </div><!-- About Page -->
+   <div id="about" class="page">
+    <section class="hero">
+     <div class="hero-content">
+      <h1>About Metcha</h1>
+      <p id="about-description">Metcha Café blends art and flavor to bring you handcrafted drinks that inspire every sip.</p>
+      <p style="margin-top: 2rem; color: #666; font-size: 1.1rem;">We believe that every drink should be an experience. From our signature matcha lattes to our perfectly brewed coffee, each beverage is crafted with premium ingredients and a passion for excellence. Join us on a journey where taste meets artistry.</p>
+     </div>
+    </section>
+   </div><!-- Privacy Policy Page -->
+   <div id="privacy" class="page">
+    <div style="max-width: 900px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 3rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);">
+     <h1 class="section-title">Privacy Policy</h1>
+     <p style="color: #666; margin-bottom: 2rem; text-align: center;">Last Updated: January 2025</p>
+     <div style="color: #333; line-height: 1.8;">
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">1. Information We Collect</h2>
+      <p style="margin-bottom: 1rem;">At Metcha, we collect information that you provide directly to us, including:</p>
+      <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+       <li>Name and contact information (email, phone number)</li>
+       <li>Account credentials and preferences</li>
+       <li>Order history and payment information</li>
+       <li>Communication preferences and feedback</li>
+      </ul>
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">2. How We Use Your Information</h2>
+      <p style="margin-bottom: 1rem;">We use the information we collect to:</p>
+      <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+       <li>Process and fulfill your orders</li>
+       <li>Communicate with you about your orders and account</li>
+       <li>Send promotional materials (with your consent)</li>
+       <li>Improve our products and services</li>
+       <li>Prevent fraud and enhance security</li>
+      </ul>
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">3. Information Sharing</h2>
+      <p style="margin-bottom: 1.5rem;">We do not sell your personal information. We may share your information with:</p>
+      <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+       <li>Service providers who assist in our operations</li>
+       <li>Payment processors for transaction processing</li>
+       <li>Legal authorities when required by law</li>
+      </ul>
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">4. Data Security</h2>
+      <p style="margin-bottom: 1.5rem;">We implement industry-standard security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.</p>
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">5. Your Rights</h2>
+      <p style="margin-bottom: 1rem;">You have the right to:</p>
+      <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+       <li>Access and update your personal information</li>
+       <li>Request deletion of your data</li>
+       <li>Opt-out of marketing communications</li>
+       <li>Request a copy of your data</li>
+      </ul>
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">6. Cookies</h2>
+      <p style="margin-bottom: 1.5rem;">We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. You can control cookie preferences through your browser settings.</p>
+      <h2 style="font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">7. Contact Us</h2>
+      <p style="margin-bottom: 1.5rem;">If you have questions about this Privacy Policy, please contact us at:</p>
+      <p style="margin-bottom: 0.5rem;"><strong>Email:</strong> privacy@metcha.com</p>
+      <p style="margin-bottom: 0.5rem;"><strong>Phone:</strong> +1 (555) 123-4567</p>
+      <p><strong>Address:</strong> 123 Café Street, Khobar, Saudi Arabia</p>
+     </div>
+    </div>
+   </div><!-- Cart Page -->
+   <div id="cart" class="page">
+    <h2 class="section-title">Shopping Cart</h2>
+    <div style="max-width: 1000px; margin: 0 auto;">
+     <div id="cart-items-container"></div>
+     <div id="cart-empty" style="text-align: center; padding: 4rem; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-radius: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);">
+      <div style="font-size: 5rem; margin-bottom: 1rem;">
+       🛒
+      </div>
+      <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; color: #333;">Your cart is empty</h3>
+      <p style="color: #666; margin-bottom: 2rem;">Add some delicious drinks to get started!</p><button class="cta-button" data-page="products">Browse Menu</button>
+     </div>
+    </div>
+   </div><!-- Checkout Page -->
+   <div id="checkout" class="page">
+    <h2 class="section-title">Checkout</h2>
+    <div style="max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+     <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 3rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);">
+      <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 2rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Payment Information</h3>
+      <form id="checkout-form">
+       <div class="form-group"><label for="card-name">Cardholder Name</label> <input type="text" id="card-name" required>
+       </div>
+       <div class="form-group"><label for="card-number">Card Number</label> <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+       </div>
+       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group"><label for="card-expiry">Expiry Date</label> <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required>
+        </div>
+        <div class="form-group"><label for="card-cvv">CVV</label> <input type="text" id="card-cvv" placeholder="123" maxlength="3" required>
+        </div>
+       </div>
+       <div class="form-group"><label for="billing-address">Billing Address</label> <input type="text" id="billing-address" required>
+       </div><button type="submit" class="submit-button"> <span class="button-text">Complete Purchase</span> <span class="spinner hidden"></span> </button>
+      </form>
+      <div id="checkout-message" style="margin-top: 1rem;"></div>
+     </div>
+     <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 3rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);">
+      <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 2rem; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Order Summary</h3>
+      <div id="checkout-summary"></div>
+     </div>
+    </div>
+   </div><!-- Auth Page -->
+   <div id="auth" class="page">
+    <div class="auth-container">
+     <h2 class="section-title" id="auth-title">Login</h2>
+     <div id="auth-message"></div><!-- Login Form -->
+     <form id="login-form">
+      <div class="form-group"><label for="login-email">Email</label> <input type="email" id="login-email" required>
+      </div>
+      <div class="form-group"><label for="login-password">Password</label>
+       <div class="password-wrapper"><input type="password" id="login-password" required> <button type="button" class="password-toggle" data-target="login-password" aria-label="Toggle password visibility">👁️</button>
+       </div>
+      </div><button type="submit" class="submit-button"> <span class="button-text">Login</span> <span class="spinner hidden"></span> </button>
+     </form><!-- Register Form -->
+     <form id="register-form" class="hidden">
+      <div class="form-group"><label for="register-name">Name</label> <input type="text" id="register-name" required>
+      </div>
+      <div class="form-group"><label for="register-email">Email</label> <input type="email" id="register-email" required>
+      </div>
+      <div class="form-group"><label for="register-password">Password</label>
+       <div class="password-wrapper"><input type="password" id="register-password" required> <button type="button" class="password-toggle" data-target="register-password" aria-label="Toggle password visibility">👁️</button>
+       </div>
+       <div class="password-requirements" id="password-requirements">
+        Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
+       </div>
+      </div>
+      <div class="form-group"><label for="register-password-confirm">Retype Password</label>
+       <div class="password-wrapper"><input type="password" id="register-password-confirm" required> <button type="button" class="password-toggle" data-target="register-password-confirm" aria-label="Toggle password visibility">👁️</button>
+       </div>
+      </div><button type="submit" class="submit-button"> <span class="button-text">Register</span> <span class="spinner hidden"></span> </button>
+     </form>
+     <div class="auth-toggle"><span id="toggle-text">Don't have an account?</span> <a id="toggle-link">Register here</a>
+     </div>
+    </div>
+   </div><!-- Contact Page -->
+   <div id="contact" class="page">
+    <h2 class="section-title">Get In Touch</h2>
+    <div class="contact-content">
+     <div class="contact-form">
+      <form id="contact-form">
+       <div class="form-group"><label for="contact-name">Name</label> <input type="text" id="contact-name" required>
+       </div>
+       <div class="form-group"><label for="contact-email">Email</label> <input type="email" id="contact-email" required>
+       </div>
+       <div class="form-group"><label for="contact-message">Message</label> <textarea id="contact-message" required></textarea>
+       </div><button type="submit" class="submit-button"> <span class="button-text">Send Message</span> <span class="spinner hidden"></span> </button>
+      </form>
+      <div id="contact-message" style="margin-top: 1rem;"></div>
+     </div>
+     <div class="map-container">
+      <div id="map"></div>
+     </div>
+    </div>
+   </div>
+  </main><!-- Footer -->
+  <footer>
+   <div class="footer-content">
+    <div class="footer-section">
+     <h3>About Metcha</h3>
+     <p id="footer-about">Metcha Café blends art and flavor to bring you handcrafted drinks that inspire every sip.</p>
+     <div class="social-icons"><a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Facebook">📘</a> <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram">📷</a> <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Twitter">🐦</a>
+     </div>
+    </div>
+    <div class="footer-section">
+     <h3>Quick Links</h3>
+     <ul class="footer-links">
+      <li><a href="#" data-page="home">Home</a></li>
+      <li><a href="#" data-page="products">Products</a></li>
+      <li><a href="#" data-page="contact">Contact</a></li>
+      <li><a href="#" data-page="privacy">Privacy Policy</a></li>
+     </ul>
+    </div>
+    <div class="footer-section">
+     <h3>Contact Info</h3>
+     <div class="contact-info">
+      <div class="contact-item"><strong>📧 Email</strong> <span id="footer-email">hello@metcha.com</span>
+      </div>
+      <div class="contact-item"><strong>📞 Phone</strong> <span id="footer-phone">+1 (555) 123-4567</span>
+      </div>
+      <div class="contact-item"><strong>📍 Address</strong> <span id="footer-address">123 Café Street, Khobar, Saudi Arabia</span>
+      </div>
+     </div>
+    </div>
+    <div class="footer-section">
+     <h3>Opening Hours</h3>
+     <div class="contact-info">
+      <div class="contact-item"><strong>Mon - Fri</strong> <span>8:00 AM - 10:00 PM</span>
+      </div>
+      <div class="contact-item"><strong>Sat - Sun</strong> <span>9:00 AM - 11:00 PM</span>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="footer-bottom">
+    <p><span id="copyright-text">© 2025 Metcha. All rights reserved.</span> Made with 💜 for drink lovers.</p>
+   </div>
+  </footer>
+  <script>
+    // Product data
+    const products = [
+      { id: 1, name: 'Matcha Latte', description: 'Creamy and smooth Japanese matcha', price: 24, emoji: '🍵' },
+      { id: 2, name: 'Iced Coffee', description: 'Cold brew perfection', price: 28, emoji: '☕' },
+      { id: 3, name: 'Caramel Macchiato', description: 'Sweet and bold espresso', price: 32, emoji: '🥤' },
+      { id: 4, name: 'Strawberry Matcha', description: 'Fruity twist on classic matcha', price: 35, emoji: '🍓' },
+      { id: 5, name: 'Vanilla Latte', description: 'Smooth vanilla espresso', price: 26, emoji: '🧋' },
+      { id: 6, name: 'Mocha Frappé', description: 'Chocolate coffee bliss', price: 38, emoji: '🍫' },
+      { id: 7, name: 'Honey Matcha', description: 'Natural sweetness meets green tea', price: 30, emoji: '🍯' },
+      { id: 8, name: 'Espresso Shot', description: 'Pure and intense', price: 24, emoji: '☕' },
+      { id: 9, name: 'Lavender Latte', description: 'Floral and calming', price: 34, emoji: '💜' },
+    ];
+
+    // Configuration
+    const defaultConfig = {
+      site_name: 'Metcha',
+      hero_slogan: 'Sip the Fun, Taste the Magic',
+      hero_subtitle: 'Handcrafted drinks made with love',
+      featured_title: 'Featured Drinks',
+      products_title: 'Our Menu',
+      about_description: 'Metcha Café blends art and flavor to bring you handcrafted drinks that inspire every sip.',
+      contact_email: 'hello@metcha.com',
+      contact_phone: '+1 (555) 123-4567',
+      contact_address: '123 Café Street, Khobar, Saudi Arabia',
+      copyright_text: '© 2025 Metcha. All rights reserved.',
+      background_color: '#ffb6c1',
+      surface_color: '#ffffff',
+      text_color: '#333333',
+      primary_color: '#ff6b9d',
+      secondary_color: '#c77dff',
+      font_family: 'Poppins',
+      font_size: 16
+    };
+
+    // Render products
+    function renderProducts(container, productList) {
+      container.innerHTML = productList.map(product => `
+        <div class="product-card">
+          <div class="product-image">${product.emoji}</div>
+          <h3 class="product-name">${product.name}</h3>
+          <p class="product-description">${product.description}</p>
+          <p class="product-price">${product.price} SAR</p>
+          <button class="add-to-cart" data-product-id="${product.id}">Add to Cart</button>
+        </div>
+      `).join('');
+    }
+
+    // Initialize products
+    renderProducts(document.getElementById('featured-products'), products.slice(0, 3));
+    renderProducts(document.getElementById('all-products'), products);
+
+    // Navigation
+    const pages = document.querySelectorAll('.page');
+    const navLinks = document.querySelectorAll('[data-page]');
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinksContainer = document.getElementById('nav-links');
+
+    function showPage(pageName) {
+      pages.forEach(page => page.classList.remove('active'));
+      document.getElementById(pageName).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      navLinksContainer.classList.remove('active');
+      menuToggle.classList.remove('active');
+    }
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pageName = link.getAttribute('data-page');
+        showPage(pageName);
+      });
+    });
+
+    menuToggle.addEventListener('click', () => {
+      navLinksContainer.classList.toggle('active');
+      menuToggle.classList.toggle('active');
+    });
+
+    // Parallax effect
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const parallaxBg = document.querySelector('.parallax-bg');
+      parallaxBg.style.transform = `translateY(${scrollY * 0.5}px)`;
+    });
+
+    // Shopping cart
+    let cart = [];
+
+    function updateCartCount() {
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = totalItems;
+    }
+
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      const existingItem = cart.find(item => item.id === productId);
+      
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+      
+      updateCartCount();
+      renderCart();
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      updateCartCount();
+      renderCart();
+    }
+
+    function updateQuantity(productId, change) {
+      const item = cart.find(item => item.id === productId);
+      if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+          removeFromCart(productId);
+        } else {
+          updateCartCount();
+          renderCart();
+        }
+      }
+    }
+
+    function getCartTotal() {
+      return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-container');
+      const emptyCart = document.getElementById('cart-empty');
+      
+      if (cart.length === 0) {
+        container.innerHTML = '';
+        emptyCart.style.display = 'block';
+        return;
+      }
+      
+      emptyCart.style.display = 'none';
+      
+      const cartHTML = `
+        <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); padding: 2rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); margin-bottom: 2rem;">
+          ${cart.map(item => `
+            <div style="display: grid; grid-template-columns: 80px 1fr auto auto; gap: 1.5rem; align-items: center; padding: 1.5rem; border-bottom: 2px solid rgba(199, 125, 255, 0.1);">
+              <div style="font-size: 3rem; text-align: center;">${item.emoji}</div>
+              <div>
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; color: #333;">${item.name}</h3>
+                <p style="color: #666; font-size: 0.9rem;">${item.description}</p>
+                <p style="font-size: 1.2rem; font-weight: 700; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-top: 0.5rem;">${item.price} SAR</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem; background: rgba(199, 125, 255, 0.1); padding: 0.5rem 1rem; border-radius: 50px;">
+                <button onclick="updateQuantity(${item.id}, -1)" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #c77dff); color: white; border: none; cursor: pointer; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center;">−</button>
+                <span style="font-weight: 700; font-size: 1.1rem; min-width: 30px; text-align: center;">${item.quantity}</span>
+                <button onclick="updateQuantity(${item.id}, 1)" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #c77dff); color: white; border: none; cursor: pointer; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center;">+</button>
+              </div>
+              <button onclick="removeFromCart(${item.id})" style="padding: 0.8rem 1.5rem; background: rgba(244, 67, 54, 0.1); color: #c62828; border: 2px solid rgba(244, 67, 54, 0.3); border-radius: 50px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;">Remove</button>
+            </div>
+          `).join('')}
+          <div style="padding: 2rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.8rem; font-weight: 700; color: #333;">Total:</h3>
+            <p style="font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${getCartTotal()} SAR</p>
+          </div>
+          <button onclick="proceedToCheckout()" class="cta-button" style="width: 100%; margin-top: 1rem;">Proceed to Checkout</button>
+        </div>
+      `;
+      
+      container.innerHTML = cartHTML;
+    }
+
+    function proceedToCheckout() {
+      if (cart.length === 0) return;
+      showPage('checkout');
+      renderCheckoutSummary();
+    }
+
+    function renderCheckoutSummary() {
+      const summary = document.getElementById('checkout-summary');
+      const total = getCartTotal();
+      const tax = total * 0.15;
+      const grandTotal = total + tax;
+      
+      summary.innerHTML = `
+        <div style="border-bottom: 2px solid rgba(199, 125, 255, 0.1); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+          ${cart.map(item => `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+              <span style="color: #666;">${item.name} × ${item.quantity}</span>
+              <span style="font-weight: 700; color: #333;">${item.price * item.quantity} SAR</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+          <span style="color: #666;">Subtotal</span>
+          <span style="font-weight: 700; color: #333;">${total} SAR</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+          <span style="color: #666;">Tax (15%)</span>
+          <span style="font-weight: 700; color: #333;">${tax.toFixed(2)} SAR</span>
+        </div>
+        <div style="border-top: 2px solid rgba(199, 125, 255, 0.2); padding-top: 1.5rem; margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 1.5rem; font-weight: 700; color: #333;">Total</span>
+          <span style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #ff6b9d, #c77dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${grandTotal.toFixed(2)} SAR</span>
+        </div>
+      `;
+    }
+
+    // Add to cart
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('add-to-cart')) {
+        const button = e.target;
+        const productId = parseInt(button.getAttribute('data-product-id'));
+        const originalText = button.innerHTML;
+        button.innerHTML = '<span class="spinner"></span>';
+        button.disabled = true;
+        
+        setTimeout(() => {
+          addToCart(productId);
+          button.innerHTML = '✓ Added!';
+          button.style.background = 'linear-gradient(135deg, #4caf50, #8bc34a)';
+          
+          setTimeout(() => {
+            button.innerHTML = originalText;
+            button.style.background = '';
+            button.disabled = false;
+          }, 2000);
+        }, 800);
+      }
+    });
+
+    // Password toggle functionality
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('password-toggle')) {
+        const targetId = e.target.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetId);
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          e.target.textContent = '🙈';
+        } else {
+          passwordInput.type = 'password';
+          e.target.textContent = '👁️';
+        }
+      }
+    });
+
+    // Password validation
+    function validatePassword(password) {
+      const minLength = password.length >= 8;
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasLowerCase = /[a-z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+      
+      return minLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+    }
+
+    // Validation function for email and password
+    function validate(email, password) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isEmailValid = emailRegex.test(email);
+      const isPasswordValid = validatePassword(password);
+      
+      return {
+        isValid: isEmailValid && isPasswordValid,
+        emailValid: isEmailValid,
+        passwordValid: isPasswordValid
+      };
+    }
+
+    // Test Runner
+    function runTests() {
+      console.log('🧪 Running Automated Front-End Tests...\n');
+      console.log('═══════════════════════════════════════════════════════════');
+      
+      const testCases = [
+        {
+          name: 'Valid credentials',
+          email: 'tester2@example.com',
+          password: 'Tester234!',
+          expectedValid: true,
+          expectedEmailValid: true,
+          expectedPasswordValid: true
+        },
+        {
+          name: 'Invalid email format',
+          email: 'invalid-email',
+          password: 'Tester234!',
+          expectedValid: false,
+          expectedEmailValid: false,
+          expectedPasswordValid: true
+        },
+        {
+          name: 'Weak password',
+          email: 'tester2@example.com',
+          password: 'pass',
+          expectedValid: false,
+          expectedEmailValid: true,
+          expectedPasswordValid: false
+        },
+        {
+          name: 'Empty email',
+          email: '',
+          password: 'Tester234!',
+          expectedValid: false,
+          expectedEmailValid: false,
+          expectedPasswordValid: true
+        },
+        {
+          name: 'Empty password',
+          email: 'tester2@example.com',
+          password: '',
+          expectedValid: false,
+          expectedEmailValid: true,
+          expectedPasswordValid: false
+        },
+        {
+          name: 'Both invalid',
+          email: 'bad-email',
+          password: 'weak',
+          expectedValid: false,
+          expectedEmailValid: false,
+          expectedPasswordValid: false
+        }
+      ];
+      
+      let passed = 0;
+      let failed = 0;
+      
+      testCases.forEach((test, index) => {
+        const result = validate(test.email, test.password);
+        const testPassed = 
+          result.isValid === test.expectedValid &&
+          result.emailValid === test.expectedEmailValid &&
+          result.passwordValid === test.expectedPasswordValid;
+        
+        if (testPassed) {
+          console.log(`✅ Test ${index + 1}: ${test.name}`);
+          console.log(`   Email: "${test.email}" | Password: "${test.password}"`);
+          console.log(`   Result: Valid=${result.isValid}, EmailValid=${result.emailValid}, PasswordValid=${result.passwordValid}`);
+          passed++;
+        } else {
+          console.log(`❌ Test ${index + 1}: ${test.name}`);
+          console.log(`   Email: "${test.email}" | Password: "${test.password}"`);
+          console.log(`   Expected: Valid=${test.expectedValid}, EmailValid=${test.expectedEmailValid}, PasswordValid=${test.expectedPasswordValid}`);
+          console.log(`   Got: Valid=${result.isValid}, EmailValid=${result.emailValid}, PasswordValid=${result.passwordValid}`);
+          failed++;
+        }
+        console.log('───────────────────────────────────────────────────────────');
+      });
+      
+      console.log('\n📊 Test Summary:');
+      console.log(`   Total: ${testCases.length}`);
+      console.log(`   ✅ Passed: ${passed}`);
+      console.log(`   ❌ Failed: ${failed}`);
+      console.log(`   Success Rate: ${((passed / testCases.length) * 100).toFixed(1)}%`);
+      console.log('═══════════════════════════════════════════════════════════\n');
+    }
+
+    // Run tests on page load
+    runTests();
+
+    // Real-time password validation
+    const registerPasswordInput = document.getElementById('register-password');
+    const passwordRequirements = document.getElementById('password-requirements');
+
+    if (registerPasswordInput) {
+      registerPasswordInput.addEventListener('input', (e) => {
+        const password = e.target.value;
+        
+        if (password.length === 0) {
+          passwordRequirements.className = 'password-requirements';
+          passwordRequirements.textContent = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.';
+        } else if (validatePassword(password)) {
+          passwordRequirements.className = 'password-requirements success';
+          passwordRequirements.textContent = '✓ Password meets all requirements';
+        } else {
+          passwordRequirements.className = 'password-requirements error';
+          passwordRequirements.textContent = '✗ Password must be at least 8 characters, include uppercase, lowercase, number, and special character.';
+        }
+      });
+    }
+
+    // Auth forms
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const toggleLink = document.getElementById('toggle-link');
+    const toggleText = document.getElementById('toggle-text');
+    const authTitle = document.getElementById('auth-title');
+    const authMessage = document.getElementById('auth-message');
+
+    let isLoginMode = true;
+
+    toggleLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      isLoginMode = !isLoginMode;
+      
+      if (isLoginMode) {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        authTitle.textContent = 'Login';
+        toggleText.textContent = "Don't have an account?";
+        toggleLink.textContent = 'Register here';
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        authTitle.textContent = 'Register';
+        toggleText.textContent = 'Already have an account?';
+        toggleLink.textContent = 'Login here';
+      }
+      authMessage.innerHTML = '';
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const validation = validate(email, password);
+      
+      if (!validation.emailValid) {
+        authMessage.innerHTML = '<div class="error-message">Please enter a valid email address.</div>';
+        return;
+      }
+      
+      if (!validation.passwordValid) {
+        authMessage.innerHTML = '<div class="error-message">Password does not meet requirements.</div>';
+        return;
+      }
+      
+      const button = loginForm.querySelector('.submit-button');
+      const buttonText = button.querySelector('.button-text');
+      const spinner = button.querySelector('.spinner');
+      
+      buttonText.classList.add('hidden');
+      spinner.classList.remove('hidden');
+      button.disabled = true;
+      
+      setTimeout(() => {
+        authMessage.innerHTML = '<div class="success-message">Login successful! Welcome back to Metcha.</div>';
+        buttonText.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        button.disabled = false;
+        loginForm.reset();
+      }, 1500);
+    });
+
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      const confirmPassword = document.getElementById('register-password-confirm').value;
+      const validation = validate(email, password);
+      
+      if (!validation.emailValid) {
+        authMessage.innerHTML = '<div class="error-message">Please enter a valid email address.</div>';
+        return;
+      }
+      
+      if (!validation.passwordValid) {
+        authMessage.innerHTML = '<div class="error-message">Password does not meet requirements. Must be at least 8 characters with uppercase, lowercase, number, and special character.</div>';
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        authMessage.innerHTML = '<div class="error-message">Passwords do not match!</div>';
+        return;
+      }
+      
+      const button = registerForm.querySelector('.submit-button');
+      const buttonText = button.querySelector('.button-text');
+      const spinner = button.querySelector('.spinner');
+      
+      buttonText.classList.add('hidden');
+      spinner.classList.remove('hidden');
+      button.disabled = true;
+      
+      setTimeout(() => {
+        authMessage.innerHTML = `<div class="success-message">Registration successful! A verification email has been sent to ${email}. Please check your inbox to verify your account before logging in.</div>`;
+        buttonText.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        button.disabled = false;
+        registerForm.reset();
+        passwordRequirements.className = 'password-requirements';
+        passwordRequirements.textContent = 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character.';
+      }, 1500);
+    });
+
+    // Contact form
+    const contactForm = document.getElementById('contact-form');
+    const contactMessage = document.getElementById('contact-message');
+
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const button = contactForm.querySelector('.submit-button');
+      const buttonText = button.querySelector('.button-text');
+      const spinner = button.querySelector('.spinner');
+      
+      buttonText.classList.add('hidden');
+      spinner.classList.remove('hidden');
+      button.disabled = true;
+      
+      setTimeout(() => {
+        contactMessage.innerHTML = '<div class="success-message">Thank you for reaching out! We\'ll get back to you soon.</div>';
+        buttonText.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        button.disabled = false;
+        contactForm.reset();
+      }, 1500);
+    });
+
+    // Checkout form
+    const checkoutForm = document.getElementById('checkout-form');
+    const checkoutMessage = document.getElementById('checkout-message');
+
+    // Card number formatting
+    document.getElementById('card-number').addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\s/g, '');
+      let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+      e.target.value = formattedValue;
+    });
+
+    // Expiry date formatting
+    document.getElementById('card-expiry').addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+      }
+      e.target.value = value;
+    });
+
+    // CVV validation
+    document.getElementById('card-cvv').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '');
+    });
+
+    checkoutForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+      const cardExpiry = document.getElementById('card-expiry').value;
+      const cardCVV = document.getElementById('card-cvv').value;
+      
+      // Basic validation
+      if (cardNumber.length < 13 || cardNumber.length > 19) {
+        checkoutMessage.innerHTML = '<div class="error-message">Please enter a valid card number.</div>';
+        return;
+      }
+      
+      if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+        checkoutMessage.innerHTML = '<div class="error-message">Please enter a valid expiry date (MM/YY).</div>';
+        return;
+      }
+      
+      if (cardCVV.length !== 3) {
+        checkoutMessage.innerHTML = '<div class="error-message">Please enter a valid CVV.</div>';
+        return;
+      }
+      
+      const button = checkoutForm.querySelector('.submit-button');
+      const buttonText = button.querySelector('.button-text');
+      const spinner = button.querySelector('.spinner');
+      
+      buttonText.classList.add('hidden');
+      spinner.classList.remove('hidden');
+      button.disabled = true;
+      
+      setTimeout(() => {
+        checkoutMessage.innerHTML = '<div class="success-message">🎉 Payment successful! Your order has been placed. Thank you for choosing Metcha!</div>';
+        buttonText.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        button.disabled = false;
+        checkoutForm.reset();
+        
+        // Clear cart after successful purchase
+        setTimeout(() => {
+          cart = [];
+          updateCartCount();
+          showPage('home');
+        }, 3000);
+      }, 2000);
+    });
+
+    // Initialize map with English labels
+    let map;
+    function initMap() {
+      // Khobar, Saudi Arabia coordinates
+      const cafeLocation = [26.2172, 50.1971];
+      
+      map = L.map('map').setView(cafeLocation, 13);
+      
+      // Using CartoDB Voyager tiles which display in English
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
+        maxZoom: 20,
+        subdomains: 'abcd'
+      }).addTo(map);
+      
+      L.marker(cafeLocation).addTo(map)
+        .bindPopup('<b>Metcha Café</b><br>Khobar, Saudi Arabia<br>Come visit us!')
+        .openPopup();
+    }
+
+    const contactPageObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.target.id === 'contact' && mutation.target.classList.contains('active')) {
+          if (!map) {
+            setTimeout(initMap, 100);
+          }
+        }
+      });
+    });
+
+    contactPageObserver.observe(document.getElementById('contact'), {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Element SDK implementation
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = 'sans-serif';
+      
+      // Update text content
+      document.getElementById('site-name').textContent = config.site_name || defaultConfig.site_name;
+      document.getElementById('hero-slogan').textContent = config.hero_slogan || defaultConfig.hero_slogan;
+      document.getElementById('hero-subtitle').textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      document.getElementById('featured-title').textContent = config.featured_title || defaultConfig.featured_title;
+      document.getElementById('products-title').textContent = config.products_title || defaultConfig.products_title;
+      document.getElementById('about-description').textContent = config.about_description || defaultConfig.about_description;
+      document.getElementById('footer-about').textContent = config.about_description || defaultConfig.about_description;
+      document.getElementById('footer-email').textContent = config.contact_email || defaultConfig.contact_email;
+      document.getElementById('footer-phone').textContent = config.contact_phone || defaultConfig.contact_phone;
+      document.getElementById('footer-address').textContent = config.contact_address || defaultConfig.contact_address;
+      document.getElementById('copyright-text').textContent = config.copyright_text || defaultConfig.copyright_text;
+      
+      // Update colors
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      
+      // Apply background
+      const bgGradient = `linear-gradient(135deg, ${backgroundColor}, ${secondaryColor})`;
+      document.querySelector('.parallax-bg').style.background = bgGradient;
+      document.body.style.background = bgGradient;
+      
+      // Apply surface color
+      const surfaceRgb = `rgba(${parseInt(surfaceColor.slice(1,3), 16)}, ${parseInt(surfaceColor.slice(3,5), 16)}, ${parseInt(surfaceColor.slice(5,7), 16)}, 0.85)`;
+      document.querySelectorAll('.hero, .product-card, .auth-container, .contact-form, .map-container, header, footer').forEach(el => {
+        el.style.background = surfaceRgb;
+      });
+      
+      // Apply text color
+      document.body.style.color = textColor;
+      document.querySelectorAll('.nav-links a, .product-name, .form-group label, footer p, .contact-info li, .footer-links a').forEach(el => {
+        el.style.color = textColor;
+      });
+      
+      // Apply primary/secondary gradient
+      const gradient = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
+      document.querySelectorAll('.cta-button, .add-to-cart, .submit-button, .social-icon').forEach(el => {
+        el.style.background = gradient;
+      });
+      
+      document.querySelectorAll('.logo, .hero h1, .section-title, .footer-section h3').forEach(el => {
+        el.style.background = gradient;
+        el.style.webkitBackgroundClip = 'text';
+        el.style.webkitTextFillColor = 'transparent';
+        el.style.backgroundClip = 'text';
+      });
+      
+      document.querySelectorAll('.product-price').forEach(el => {
+        el.style.background = gradient;
+        el.style.webkitBackgroundClip = 'text';
+        el.style.webkitTextFillColor = 'transparent';
+        el.style.backgroundClip = 'text';
+      });
+      
+      document.querySelectorAll('.auth-toggle a').forEach(el => {
+        el.style.color = secondaryColor;
+      });
+      
+      // Update fonts
+      document.querySelectorAll('.hero h1, .section-title').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize * 2.5}px`;
+      });
+      
+      document.querySelectorAll('.hero p').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize * 1.4}px`;
+      });
+      
+      document.querySelectorAll('.product-name, .footer-section h3').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize * 1.4}px`;
+      });
+      
+      document.querySelectorAll('body, .nav-links a, button, input, textarea, .product-description').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize}px`;
+      });
+      
+      document.querySelectorAll('.logo').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize * 2}px`;
+      });
+    }
+
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig: defaultConfig,
+        onConfigChange: onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_color || defaultConfig.primary_color,
+              set: (value) => {
+                config.primary_color = value;
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_color || defaultConfig.secondary_color,
+              set: (value) => {
+                config.secondary_color = value;
+                window.elementSdk.setConfig({ secondary_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['site_name', config.site_name || defaultConfig.site_name],
+          ['hero_slogan', config.hero_slogan || defaultConfig.hero_slogan],
+          ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle],
+          ['featured_title', config.featured_title || defaultConfig.featured_title],
+          ['products_title', config.products_title || defaultConfig.products_title],
+          ['about_description', config.about_description || defaultConfig.about_description],
+          ['contact_email', config.contact_email || defaultConfig.contact_email],
+          ['contact_phone', config.contact_phone || defaultConfig.contact_phone],
+          ['contact_address', config.contact_address || defaultConfig.contact_address],
+          ['copyright_text', config.copyright_text || defaultConfig.copyright_text]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99cefa4295ccedbc',t:'MTc2Mjg3NjU2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

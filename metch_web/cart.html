@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Metcha Café - Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ========= Base / Reset ========= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffb6c1, #cfa7ff);
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* ========= Parallax BG ========= */
+    .parallax-bg {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #ffb6c1, #cfa7ff);
+      z-index: -1; transform: translateZ(0);
+    }
+
+    /* ========= Header / Nav ========= */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 1.2rem 2rem;
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+    }
+    nav {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo {
+      font-size: 2rem; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: #333; font-weight: 600;
+      transition: all .3s ease; position: relative; font-size: 1rem;
+    }
+    .nav-links a:hover { color: #c77dff; transform: translateY(-2px); }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 3px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      transition: width .3s ease; border-radius: 2px;
+    }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ========= Layout ========= */
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+    /* ========= Titles ========= */
+    .section-title {
+      text-align: center; font-size: 3rem; font-weight: 800; margin-bottom: 3rem; letter-spacing: -1px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ========= Cart / Checkout ========= */
+    .cart-empty {
+      text-align: center; padding: 4rem;
+      background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
+      border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    }
+    .cart-card {
+      background: rgba(255,255,255,.85); backdrop-filter: blur(20px);
+      padding: 2rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,.15); margin-bottom: 2rem;
+    }
+    .qty-badge {
+      display: flex; align-items: center; gap: 1rem;
+      background: rgba(199,125,255,.1); padding: .5rem 1rem; border-radius: 50px;
+    }
+    .qty-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff); color: #fff; border: none;
+      cursor: pointer; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      transition: all .3s ease;
+    }
+    .qty-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 5px 15px rgba(199,125,255,.4);
+    }
+
+    /* ========= Buttons ========= */
+    .cta-button {
+      display: inline-block; padding: 1.2rem 3rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      color: #fff; text-decoration: none; border-radius: 50px;
+      font-weight: 700; font-size: 1.1rem; transition: all .4s ease;
+      box-shadow: 0 10px 30px rgba(199,125,255,.4); border: none; cursor: pointer;
+      transform-style: preserve-3d;
+    }
+    .cta-button:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 20px 50px rgba(199,125,255,.6), 0 0 30px rgba(255,107,157,.5);
+    }
+
+    /* ========= Footer ========= */
+    footer {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 4rem 2rem 2rem; margin-top: 5rem;
+      box-shadow: 0 -4px 30px rgba(0,0,0,.1);
+    }
+    .footer-content {
+      max-width: 1400px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem; margin-bottom: 3rem;
+    }
+    .footer-section {
+      background: rgba(255,240,245,.95); backdrop-filter: blur(10px);
+      padding: 1.8rem; border-radius: 20px; box-shadow: 0 8px 25px rgba(255,182,193,.3);
+      transition: all .4s ease; transform-style: preserve-3d;
+      border: 2px solid rgba(255,182,193,.3);
+    }
+    .footer-section:hover {
+      transform: translateY(-10px) scale(1.03) rotateX(5deg);
+      box-shadow: 0 20px 50px rgba(255,182,193,.6), 0 0 40px rgba(255,182,193,.5);
+      border-color: rgba(255,182,193,.6);
+    }
+    .footer-section h3 {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .footer-section p { color: #666; line-height: 1.6; margin-bottom: .8rem; font-size: .9rem; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: .6rem; }
+    .footer-links a { color: #666; text-decoration: none; transition: all .3s ease; font-weight: 500; font-size: .9rem; }
+    .footer-links a:hover { color: #c77dff; padding-left: 5px; }
+    .contact-info { list-style: none; display: flex; flex-direction: column; gap: .8rem; }
+    .contact-item { padding: .6rem 0; border-bottom: 1px solid rgba(255,182,193,.2); }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-item strong {
+      color: #333; display: block; margin-bottom: .4rem; font-size: .9rem; font-weight: 700;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .contact-item span { color: #666; font-weight: 500; font-size: .85rem; }
+
+    .social-icons { display: flex; gap: 1rem; margin-top: 1.2rem; }
+    .social-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.2rem; text-decoration: none; transition: all .4s ease;
+      box-shadow: 0 5px 20px rgba(199,125,255,.3); transform-style: preserve-3d;
+    }
+    .social-icon:hover {
+      transform: translateY(-8px) scale(1.15) rotateZ(10deg);
+      box-shadow: 0 20px 50px rgba(199,125,255,.6), 0 0 40px rgba(255,107,157,.6);
+    }
+    .footer-bottom {
+      text-align: center; padding-top: 2rem; border-top: 2px solid rgba(199,125,255,.2);
+      color: #666; font-weight: 500;
+    }
+
+    /* ========= Utility ========= */
+    .hidden { display: none; }
+
+    /* ========= Responsive ========= */
+    @media (max-width: 1024px) {
+      .footer-content { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .section-title { font-size: 2.2rem; }
+      .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+      main { padding: 1rem; }
+      .nav-links { flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="parallax-bg"></div>
+  
+  <header>
+    <nav>
+      <div class="logo">Metcha Café</div>
+      <ul class="nav-links">
+        <li><a href="index.html#home">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="section-title">Shopping Cart</h2>
+    <div style="max-width:1000px;margin:0 auto;">
+      <div id="cart-items-container"></div>
+
+      <div id="cart-empty" class="cart-empty hidden">
+        <div style="font-size:5rem;margin-bottom:1rem;">🛒</div>
+        <h3 style="font-size:1.8rem;font-weight:700;margin-bottom:1rem;color:#333;">Your cart is empty</h3>
+        <p style="color:#666;margin-bottom:2rem;">Add some delicious drinks to get started!</p>
+        <a class="cta-button" href="products.html">Browse Menu</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Metcha</h3>
+        <p>Metcha Café blends art and flavor to bring you handcrafted drinks that inspire every sip.</p>
+        <div class="social-icons">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Facebook">📘</a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram">📷</a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Twitter">🐦</a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="index.html#home">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Contact Info</h3>
+        <div class="contact-info">
+          <div class="contact-item"><strong>📧 Email</strong><span>hello@metcha.com</span></div>
+          <div class="contact-item"><strong>📞 Phone</strong><span>+1 (555) 123-4567</span></div>
+          <div class="contact-item"><strong>📍 Address</strong><span>123 Café Street, Khobar, Saudi Arabia</span></div>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Opening Hours</h3>
+        <div class="contact-info">
+          <div class="contact-item"><strong>Mon - Fri</strong><span>8:00 AM - 10:00 PM</span></div>
+          <div class="contact-item"><strong>Sat - Sun</strong><span>9:00 AM - 11:00 PM</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Metcha. All rights reserved. Made with 💜 for drink lovers.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Product list (must match your products)
+    const products = [
+      { id: 1, name: 'Matcha Latte', description: 'Creamy and smooth Japanese matcha', price: 24, emoji: '🍵' },
+      { id: 2, name: 'Iced Coffee', description: 'Cold brew perfection', price: 28, emoji: '☕' },
+      { id: 3, name: 'Caramel Macchiato', description: 'Sweet and bold espresso', price: 32, emoji: '🥤' },
+      { id: 4, name: 'Strawberry Matcha', description: 'Fruity twist on classic matcha', price: 35, emoji: '🍓' },
+      { id: 5, name: 'Vanilla Latte', description: 'Smooth vanilla espresso', price: 26, emoji: '🧋' },
+      { id: 6, name: 'Mocha Frappé', description: 'Chocolate coffee bliss', price: 38, emoji: '🍫' },
+      { id: 7, name: 'Honey Matcha', description: 'Natural sweetness meets green tea', price: 30, emoji: '🍯' },
+      { id: 8, name: 'Espresso Shot', description: 'Pure and intense', price: 24, emoji: '☕' },
+      { id: 9, name: 'Lavender Latte', description: 'Floral and calming', price: 34, emoji: '💜' },
+    ];
+
+    const CART_KEY = 'metcha_cart';
+
+    // Read cart from localStorage
+    function readCart() {
+      try {
+        const raw = localStorage.getItem(CART_KEY);
+        const cart = JSON.parse(raw || '[]');
+        return cart.map(item => ({ ...item, quantity: Number(item.quantity || 0) }));
+      } catch {
+        return [];
+      }
+    }
+
+    // Save cart
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    // Update cart count
+    function updateCartCount() {
+      const cart = readCart();
+      const totalItems = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+      const el = document.getElementById('cart-count');
+      if (el) el.textContent = totalItems;
+    }
+
+    // Calculate subtotal
+    function getCartSubtotal(cart = readCart()) {
+      return cart.reduce((sum, i) => sum + (Number(i.price) * Number(i.quantity || 0)), 0);
+    }
+
+    // Render cart page
+    function renderCartPage() {
+      const container = document.getElementById('cart-items-container');
+      const emptyBlock = document.getElementById('cart-empty');
+      if (!container || !emptyBlock) return;
+
+      const cart = readCart();
+      if (cart.length === 0) {
+        container.innerHTML = '';
+        emptyBlock.classList.remove('hidden');
+        return;
+      }
+      emptyBlock.classList.add('hidden');
+
+      const rows = cart.map(item => `
+        <div style="display:grid;grid-template-columns:80px 1fr auto auto;gap:1.5rem;align-items:center;padding:1.5rem;border-bottom:2px solid rgba(199,125,255,0.1);">
+          <div style="font-size:3rem;text-align:center;">${item.emoji}</div>
+          <div>
+            <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:.3rem;color:#333;">${item.name}</h3>
+            <p style="color:#666;font-size:.9rem;">${item.description}</p>
+            <p style="font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,#ff6b9d,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:.5rem;">${item.price} SAR</p>
+          </div>
+          <div class="qty-badge">
+            <button class="qty-btn" data-act="dec" data-id="${item.id}">−</button>
+            <span style="font-weight:700;font-size:1.1rem;min-width:30px;text-align:center;">${item.quantity}</span>
+            <button class="qty-btn" data-act="inc" data-id="${item.id}">+</button>
+          </div>
+          <button class="remove-btn" data-id="${item.id}" style="padding:.8rem 1.5rem;background:rgba(244,67,54,.1);color:#c62828;border:2px solid rgba(244,67,54,.3);border-radius:50px;font-weight:700;cursor:pointer;transition:all .3s ease;">Remove</button>
+        </div>
+      `).join('');
+
+      const total = getCartSubtotal(cart);
+      const totalBlock = `
+        <div style="padding:2rem 1.5rem 1rem;display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="font-size:1.8rem;font-weight:700;color:#333;">Total:</h3>
+          <p style="font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#ff6b9d,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${total} SAR</p>
+        </div>
+        <a href="checkout.html" class="cta-button" style="width:100%;text-align:center;display:block;margin-top:1rem;">Proceed to Checkout</a>
+      `;
+
+      container.innerHTML = `<div class="cart-card">${rows}${totalBlock}</div>`;
+    }
+
+    // Remove from cart
+    function removeFromCart(productId) {
+      const cart = readCart().filter(i => i.id !== Number(productId));
+      saveCart(cart);
+      updateCartCount();
+      renderCartPage();
+    }
+
+    // Update quantity
+    function updateQuantity(productId, delta) {
+      const cart = readCart();
+      const item = cart.find(i => i.id === Number(productId));
+      if (!item) return;
+      item.quantity = Math.max(0, Number(item.quantity || 0) + delta);
+      const next = item.quantity === 0 ? cart.filter(i => i.id !== item.id) : cart;
+      saveCart(next);
+      updateCartCount();
+      renderCartPage();
+    }
+
+    // Parallax effect
+    const bg = document.querySelector('.parallax-bg');
+    if (bg) {
+      window.addEventListener('scroll', () => {
+        bg.style.transform = `translateY(${window.scrollY * 0.5}px)`;
+      });
+    }
+
+    // Event delegation for cart buttons
+    document.body.addEventListener('click', (e) => {
+      const qtyBtn = e.target.closest('.qty-btn');
+      if (qtyBtn) {
+        const id = Number(qtyBtn.getAttribute('data-id'));
+        const act = qtyBtn.getAttribute('data-act');
+        updateQuantity(id, act === 'inc' ? 1 : -1);
+      }
+
+      const rem = e.target.closest('.remove-btn');
+      if (rem) removeFromCart(Number(rem.getAttribute('data-id')));
+    });
+
+    // Initialize
+    updateCartCount();
+    renderCartPage();
+  </script>
+</body>
+</html>

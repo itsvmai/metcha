@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Metcha Café - Contact</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    /* ========= Base / Reset ========= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffb6c1, #cfa7ff);
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* ========= Parallax BG ========= */
+    .parallax-bg {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #ffb6c1, #cfa7ff);
+      z-index: -1; transform: translateZ(0);
+    }
+
+    /* ========= Header / Nav ========= */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 1.2rem 2rem;
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+    }
+    nav {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo {
+      font-size: 2rem; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: #333; font-weight: 600;
+      transition: all .3s ease; position: relative; font-size: 1rem;
+    }
+    .nav-links a:hover { color: #c77dff; transform: translateY(-2px); }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 3px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      transition: width .3s ease; border-radius: 2px;
+    }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ========= Layout ========= */
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+    /* ========= Titles ========= */
+    .section-title {
+      text-align: center; font-size: 3rem; font-weight: 800; margin-bottom: 3rem; letter-spacing: -1px;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ========= Contact / Map ========= */
+    .contact-content {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4rem;
+    }
+    .contact-form {
+      background: rgba(255,255,255,.85); backdrop-filter: blur(20px);
+      padding: 3rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    }
+    .form-group { margin-bottom: 1.8rem; }
+    .form-group label { display: block; margin-bottom: .7rem; font-weight: 600; color: #333; font-size: 1rem; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 1.2rem;
+      border: 2px solid rgba(199,125,255,.3); border-radius: 20px; font-size: 1rem;
+      font-family: 'Poppins', sans-serif; transition: all .3s ease;
+      background: rgba(255,255,255,.95);
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none; border-color: #c77dff; box-shadow: 0 0 0 4px rgba(199,125,255,.15); transform: translateY(-2px);
+    }
+    .form-group textarea { min-height: 180px; resize: vertical; }
+    
+    .map-container {
+      background: rgba(255,255,255,.85); backdrop-filter: blur(20px);
+      border-radius: 30px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.15); height: 500px;
+    }
+    #map { width: 100%; height: 100%; }
+
+    /* ========= Buttons ========= */
+    .submit-button {
+      width: 100%; padding: 1.2rem 3rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      color: #fff; text-decoration: none; border-radius: 50px;
+      font-weight: 700; font-size: 1.1rem; transition: all .4s ease;
+      box-shadow: 0 10px 30px rgba(199,125,255,.4); border: none; cursor: pointer;
+      transform-style: preserve-3d; display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .submit-button:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 20px 50px rgba(199,125,255,.6), 0 0 30px rgba(255,107,157,.5);
+    }
+    .submit-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .success-message, .error-message {
+      padding: 1.2rem; border-radius: 20px; margin-bottom: 1.5rem; text-align: center; font-weight: 600;
+      animation: slideIn .4s ease;
+    }
+    @keyframes slideIn { from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:translateY(0)} }
+    .success-message { background: rgba(76,175,80,.15); color: #2e7d32; border: 2px solid rgba(76,175,80,.4); }
+    .error-message { background: rgba(244,67,54,.15); color: #c62828; border: 2px solid rgba(244,67,54,.4); }
+
+    /* ========= Footer ========= */
+    footer {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 4rem 2rem 2rem; margin-top: 5rem;
+      box-shadow: 0 -4px 30px rgba(0,0,0,.1);
+    }
+    .footer-content {
+      max-width: 1400px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem; margin-bottom: 3rem;
+    }
+    .footer-section {
+      background: rgba(255,240,245,.95); backdrop-filter: blur(10px);
+      padding: 1.8rem; border-radius: 20px; box-shadow: 0 8px 25px rgba(255,182,193,.3);
+      transition: all .4s ease; transform-style: preserve-3d;
+      border: 2px solid rgba(255,182,193,.3);
+    }
+    .footer-section:hover {
+      transform: translateY(-10px) scale(1.03) rotateX(5deg);
+      box-shadow: 0 20px 50px rgba(255,182,193,.6), 0 0 40px rgba(255,182,193,.5);
+      border-color: rgba(255,182,193,.6);
+    }
+    .footer-section h3 {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .footer-section p { color: #666; line-height: 1.6; margin-bottom: .8rem; font-size: .9rem; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: .6rem; }
+    .footer-links a { color: #666; text-decoration: none; transition: all .3s ease; font-weight: 500; font-size: .9rem; }
+    .footer-links a:hover { color: #c77dff; padding-left: 5px; }
+    .contact-info { list-style: none; display: flex; flex-direction: column; gap: .8rem; }
+    .contact-item { padding: .6rem 0; border-bottom: 1px solid rgba(255,182,193,.2); }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-item strong {
+      color: #333; display: block; margin-bottom: .4rem; font-size: .9rem; font-weight: 700;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .contact-item span { color: #666; font-weight: 500; font-size: .85rem; }
+
+    .social-icons { display: flex; gap: 1rem; margin-top: 1.2rem; }
+    .social-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b9d, #c77dff);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.2rem; text-decoration: none; transition: all .4s ease;
+      box-shadow: 0 5px 20px rgba(199,125,255,.3); transform-style: preserve-3d;
+    }
+    .social-icon:hover {
+      transform: translateY(-8px) scale(1.15) rotateZ(10deg);
+      box-shadow: 0 20px 50px rgba(199,125,255,.6), 0 0 40px rgba(255,107,157,.6);
+    }
+    .footer-bottom {
+      text-align: center; padding-top: 2rem; border-top: 2px solid rgba(199,125,255,.2);
+      color: #666; font-weight: 500;
+    }
+
+    /* ========= Utility ========= */
+    .hidden { display: none; }
+    .spinner {
+      display: inline-block; width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,.3); border-radius: 50%;
+      border-top-color: #fff; animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ========= Responsive ========= */
+    @media (max-width: 1024px) {
+      .footer-content { grid-template-columns: repeat(2, 1fr); }
+      .contact-content { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .section-title { font-size: 2.2rem; }
+      .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+      main { padding: 1rem; }
+      .contact-form { padding: 2rem; }
+      .nav-links { flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; }
+    }
+  </style>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div class="parallax-bg"></div>
+  
+  <header>
+    <nav>
+      <div class="logo">Metcha Café</div>
+      <ul class="nav-links">
+        <li><a href="index.html#home">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="section-title">Get In Touch</h2>
+    <div class="contact-content">
+      <div class="contact-form">
+        <div id="form-messages"></div>
+        <form id="contact-form">
+          <div class="form-group">
+            <label for="contact-name">Name</label>
+            <input id="contact-name" type="text" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email</label>
+            <input id="contact-email" type="email" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-message">Message</label>
+            <textarea id="contact-message" required></textarea>
+          </div>
+          <button type="submit" class="submit-button">
+            <span class="button-text">Send Message</span>
+            <span class="spinner hidden"></span>
+          </button>
+        </form>
+      </div>
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Metcha</h3>
+        <p>Your destination for premium matcha and coffee experiences. We blend tradition with modern taste.</p>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="cart.html">Cart</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Contact Info</h3>
+        <ul class="contact-info">
+          <li class="contact-item">
+            <strong>📍 Location</strong>
+            <span>Khobar, Saudi Arabia</span>
+          </li>
+          <li class="contact-item">
+            <strong>📧 Email</strong>
+            <span>hello@metcha.cafe</span>
+          </li>
+          <li class="contact-item">
+            <strong>📱 Phone</strong>
+            <span>+966 50 123 4567</span>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <p>Stay connected for updates and special offers</p>
+        <div class="social-icons">
+          <a href="#" class="social-icon">📘</a>
+          <a href="#" class="social-icon">📷</a>
+          <a href="#" class="social-icon">🐦</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Metcha Café. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Parallax scroll effect
+    const bg = document.querySelector('.parallax-bg');
+    if (bg) {
+      window.addEventListener('scroll', () => {
+        bg.style.transform = `translateY(${window.scrollY * 0.5}px)`;
+      });
+    }
+
+    // Initialize Leaflet map
+    if (document.getElementById('map')) {
+      const cafeLocation = [26.2172, 50.1971]; // Khobar coordinates
+      const map = L.map('map').setView(cafeLocation, 13);
+      
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors © CARTO',
+        maxZoom: 20,
+        subdomains: 'abcd'
+      }).addTo(map);
+      
+      L.marker(cafeLocation).addTo(map)
+        .bindPopup('<b>Metcha Café</b><br>Khobar, Saudi Arabia<br>Come visit us!')
+        .openPopup();
+    }
+
+    // Contact form submission
+    const contactForm = document.getElementById('contact-form');
+    const formMessages = document.getElementById('form-messages');
+    
+    if (contactForm && formMessages) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const btn = contactForm.querySelector('.submit-button');
+        const text = btn.querySelector('.button-text');
+        const spinner = btn.querySelector('.spinner');
+        
+        // Show loading state
+        text.classList.add('hidden');
+        spinner.classList.remove('hidden');
+        btn.disabled = true;
+        
+        // Simulate sending (replace with actual backend call)
+        setTimeout(() => {
+          formMessages.innerHTML = '<div class="success-message">Thanks! We\'ll get back to you soon.</div>';
+          text.classList.remove('hidden');
+          spinner.classList.add('hidden');
+          btn.disabled = false;
+          contactForm.reset();
+          
+          // Clear message after 5 seconds
+          setTimeout(() => {
+            formMessages.innerHTML = '';
+          }, 5000);
+        }, 900);
+      });
+    }
+
+    // Update cart count from localStorage
+    function updateCartCount() {
+      try {
+        const cart = JSON.parse(localStorage.getItem('metcha_cart') || '[]');
+        const totalItems = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        const el = document.getElementById('cart-count');
+        if (el) el.textContent = totalItems;
+      } catch {
+        const el = document.getElementById('cart-count');
+        if (el) el.textContent = '0';
+      }
+    }
+    
+    updateCartCount();
+  </script>
+</body>
+</html>
